@@ -1251,6 +1251,96 @@
             text-align: left;
         }
 
+        /* Player properties modal */
+        .player-properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .player-property-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .player-property-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+        }
+
+        .player-property-card .prop-color-bar {
+            height: 8px;
+        }
+
+        .player-property-card .prop-content {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .player-property-card .prop-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .player-property-card .prop-image {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            margin-bottom: 5px;
+        }
+
+        .player-property-card .prop-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-property-card .prop-houses {
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        .player-property-card.mortgaged {
+            opacity: 0.6;
+            filter: grayscale(50%);
+        }
+
+        .player-property-card.mortgaged::after {
+            content: 'HIPOTECADA';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            background: rgba(255,0,0,0.8);
+            color: white;
+            padding: 3px 8px;
+            font-size: 0.6rem;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+
+        .player-property-card {
+            position: relative;
+        }
+
+        .no-properties {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-style: italic;
+        }
+
         .modal-buttons {
             display: flex;
             gap: 10px;
@@ -5277,6 +5367,162 @@
             }
 
             return monopolies;
+        }
+
+        function showPlayerProperties(playerIndex) {
+            const player = gameState.players[playerIndex];
+            const properties = player.properties;
+
+            let propertiesHtml = '';
+            if (properties.length === 0) {
+                propertiesHtml = '<div class="no-properties">Aquest jugador no té propietats</div>';
+            } else {
+                propertiesHtml = '<div class="player-properties-grid">';
+                properties.forEach(propId => {
+                    const square = SQUARES[propId];
+                    const propState = gameState.properties[propId];
+                    const groupInfo = square.group ? PROPERTY_GROUPS[square.group] : null;
+                    const color = groupInfo?.color || '#607D8B';
+                    const isMortgaged = propState?.mortgaged;
+                    const houses = propState?.houses || 0;
+
+                    let housesText = '';
+                    if (square.type === 'property' && square.rent) {
+                        if (houses === 5) {
+                            housesText = '🏨 Hotel';
+                        } else if (houses > 0) {
+                            housesText = '🏠'.repeat(houses);
+                        }
+                    }
+
+                    const imageHtml = square.image
+                        ? `<img class="prop-image" src="${square.image}" alt="${square.name}">`
+                        : `<div class="prop-icon">${square.icon}</div>`;
+
+                    propertiesHtml += `
+                        <div class="player-property-card ${isMortgaged ? 'mortgaged' : ''}" data-prop-id="${propId}">
+                            <div class="prop-color-bar" style="background: ${color}"></div>
+                            <div class="prop-content">
+                                ${imageHtml}
+                                <div class="prop-name">${square.name}</div>
+                                ${housesText ? `<div class="prop-houses">${housesText}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                propertiesHtml += '</div>';
+            }
+
+            showModal({
+                headerHtml: `
+                    <div class="property-header" style="background: linear-gradient(135deg, #2196F3, #1976D2)">
+                        <div style="font-size: 2rem">${renderToken(player.token)}</div>
+                        <div class="property-name">Propietats de ${player.name}</div>
+                        <div class="property-movie">${player.money}€ · ${properties.length} propietats</div>
+                    </div>
+                `,
+                bodyHtml: propertiesHtml,
+                landscape: properties.length > 0,
+                buttons: [
+                    {
+                        text: 'Tancar',
+                        class: 'btn-close',
+                        action: closeModal
+                    }
+                ]
+            });
+
+            // Add click handlers to property cards after modal is shown
+            setTimeout(() => {
+                document.querySelectorAll('.player-property-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const propId = parseInt(card.dataset.propId);
+                        const square = SQUARES[propId];
+                        showPropertyDetails(square);
+                    });
+                });
+            }, 100);
+        }
+
+        function showPropertyDetails(square) {
+            const groupInfo = square.group ? PROPERTY_GROUPS[square.group] : null;
+            const color = groupInfo?.color || '#607D8B';
+            const propState = gameState.properties[square.id];
+            const houses = propState?.houses || 0;
+
+            let rentHtml = '';
+            if (square.rent) {
+                rentHtml = `
+                    <div class="rent-info">
+                        <h4>Alquileres:</h4>
+                        <div class="rent-row"><span>Sin casas:</span><span>${square.rent[0]}€</span></div>
+                        <div class="rent-row"><span>1 casa:</span><span>${square.rent[1]}€</span></div>
+                        <div class="rent-row"><span>2 casas:</span><span>${square.rent[2]}€</span></div>
+                        <div class="rent-row"><span>3 casas:</span><span>${square.rent[3]}€</span></div>
+                        <div class="rent-row"><span>4 casas:</span><span>${square.rent[4]}€</span></div>
+                        <div class="rent-row"><span>Hotel:</span><span>${square.rent[5]}€</span></div>
+                    </div>
+                `;
+            } else if (square.type === 'station') {
+                rentHtml = `
+                    <div class="rent-info">
+                        <h4>Alquileres:</h4>
+                        <div class="rent-row"><span>1 estació:</span><span>25€</span></div>
+                        <div class="rent-row"><span>2 estacions:</span><span>50€</span></div>
+                        <div class="rent-row"><span>3 estacions:</span><span>100€</span></div>
+                        <div class="rent-row"><span>4 estacions:</span><span>200€</span></div>
+                    </div>
+                `;
+            } else if (square.type === 'utility') {
+                rentHtml = `
+                    <div class="rent-info">
+                        <h4>Alquileres:</h4>
+                        <div class="rent-row"><span>1 servei:</span><span>4x daus</span></div>
+                        <div class="rent-row"><span>2 serveis:</span><span>10x daus</span></div>
+                    </div>
+                `;
+            }
+
+            const hasImage = square.image;
+            let bodyContent = '';
+            if (hasImage) {
+                bodyContent = `
+                    <div class="property-landscape">
+                        <div class="property-image-side">
+                            <img src="${square.image}" alt="${square.name}">
+                        </div>
+                        <div class="property-info-side">
+                            ${houses === 5 ? '<p style="color: #9C27B0; font-weight: bold;">🏨 Hotel</p>' : houses > 0 ? `<p style="color: #4CAF50; font-weight: bold;">${'🏠'.repeat(houses)} ${houses} casa${houses > 1 ? 's' : ''}</p>` : ''}
+                            ${rentHtml}
+                        </div>
+                    </div>
+                `;
+            } else {
+                bodyContent = `
+                    ${houses === 5 ? '<p style="color: #9C27B0; font-weight: bold;">🏨 Hotel</p>' : houses > 0 ? `<p style="color: #4CAF50; font-weight: bold;">${'🏠'.repeat(houses)} ${houses} casa${houses > 1 ? 's' : ''}</p>` : ''}
+                    ${rentHtml}
+                `;
+            }
+
+            showModal({
+                headerHtml: `
+                    <div class="property-header" style="background: ${color}">
+                        <div style="font-size: 2rem">${square.icon}</div>
+                        <div class="property-name">${square.name}</div>
+                        ${groupInfo ? `<div class="property-movie">${groupInfo.name}</div>` : ''}
+                    </div>
+                `,
+                bodyHtml: bodyContent,
+                landscape: hasImage,
+                buttons: [
+                    {
+                        text: 'Tancar',
+                        class: 'btn-close',
+                        action: closeModal
+                    }
+                ]
+            });
         }
 
         function updateMoneyBar() {
