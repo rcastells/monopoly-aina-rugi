@@ -133,7 +133,7 @@
             object-fit: contain;
         }
 
-        .token-on-board img { width: 2.2rem; height: 2.2rem; object-fit: contain; }
+        .token-on-board img { width: 2rem; height: 2rem; object-fit: contain; border-radius: 50%; }
 
         .player-input input {
             flex: 1;
@@ -343,14 +343,87 @@
         }
 
         .game-header {
-            text-align: center;
-            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 100%);
+            border-bottom: 2px solid rgba(255,215,0,0.3);
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         .game-header h1 {
-            font-size: 1.8rem;
+            font-size: 1.2rem;
+            color: #FFD700;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .header-center {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-timer, .header-turn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .header-timer { display: none; }
+        .header-timer.visible { display: flex; }
+        .header-turn { display: none; }
+        .header-turn.visible { display: flex; }
+
+        .header-timer .timer-icon, .header-turn .turn-icon {
+            font-size: 1rem;
+        }
+
+        .header-timer .timer-value, .header-turn .turn-value {
+            font-family: 'Fredoka One', cursive;
             color: #FFD700;
         }
+
+        .header-timer.warning {
+            animation: timerPulse 1s infinite;
+            background: rgba(255,100,0,0.3);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            width: 38px;
+            height: 38px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .header-btn.btn-save { background: linear-gradient(135deg, #4CAF50, #45a049); }
+        .header-btn.btn-load { background: linear-gradient(135deg, #2196F3, #1976D2); }
+        .header-btn.btn-rules { background: linear-gradient(135deg, #FF9800, #F57C00); }
+        .header-btn.btn-music { background: linear-gradient(135deg, #9C27B0, #7B1FA2); }
+        .header-btn.btn-music.playing { background: linear-gradient(135deg, #E91E63, #C2185B); box-shadow: 0 0 15px rgba(233, 30, 99, 0.5); }
+        .header-btn.btn-load:disabled { opacity: 0.5; cursor: not-allowed; }
+        .header-btn.btn-settings { background: linear-gradient(135deg, #607D8B, #455A64); }
 
         /* Money Bar */
         .money-bar {
@@ -521,12 +594,7 @@
         }
 
         .square .color-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 22%;
-            min-height: 12px;
+            display: none; /* No longer used - using box-shadow border instead */
         }
 
         .square .name {
@@ -539,17 +607,25 @@
 
         .square .icon {
             font-size: 2.2rem;
-            margin-top: 20%;
+            margin-top: 0;
         }
 
-        /* Property image support */
+        /* Property image support - full square background */
         .square .property-image {
-            width: 90%;
-            height: auto;
-            max-height: 70%;
-            object-fit: contain;
-            margin-top: 15%;
-            border-radius: 4px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        /* Ensure other elements appear above image */
+        .square .houses,
+        .square .owner-indicator,
+        .square .icon {
+            z-index: 2;
         }
 
         /* Houses display */
@@ -599,6 +675,9 @@
             border-radius: 50%;
             padding: 2px;
             border: 1px solid #FFD700;
+        }
+        .square .owner-indicator:empty {
+            display: none;
         }
         .square .owner-indicator img {
             width: 1rem !important;
@@ -868,6 +947,11 @@
             font-size: 2.2rem;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.6));
             transition: all 0.5s ease;
+            background: white;
+            border-radius: 50%;
+            padding: 4px;
+            border: 2px solid #333;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         }
 
         /* Players Panel */
@@ -1001,6 +1085,65 @@
             color: #333;
             text-align: center;
             animation: popIn 0.3s ease;
+        }
+
+        .modal.landscape {
+            max-width: 700px;
+            width: 95%;
+        }
+
+        .modal .property-landscape {
+            display: flex;
+            gap: 25px;
+            margin-top: 15px;
+        }
+
+        .modal .property-landscape .property-image-side {
+            flex: 0 0 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .modal .property-landscape .property-image-side img {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .modal .property-landscape .property-info-side {
+            flex: 1;
+            text-align: left;
+        }
+
+        .modal .property-landscape .property-price {
+            font-size: 2.5rem;
+            margin: 0 0 15px 0;
+            text-align: left;
+        }
+
+        .modal .property-landscape .rent-info {
+            margin: 0;
+        }
+
+        @media (max-width: 600px) {
+            .modal.landscape {
+                max-width: 95%;
+            }
+            .modal .property-landscape {
+                flex-direction: column;
+            }
+            .modal .property-landscape .property-image-side {
+                flex: none;
+            }
+            .modal .property-landscape .property-info-side {
+                text-align: center;
+            }
+            .modal .property-landscape .property-price {
+                text-align: center;
+            }
         }
 
         @keyframes popIn {
@@ -1351,13 +1494,22 @@
         }
 
         .zoom-square .player-tokens span {
-            font-size: 2rem;
+            font-size: 1.8rem;
             filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.5));
+            background: white;
+            border-radius: 50%;
+            padding: 5px;
+            border: 2px solid #333;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .zoom-square .player-tokens img {
-            width: 2rem;
-            height: 2rem;
+            width: 1.8rem;
+            height: 1.8rem;
+            border-radius: 50%;
         }
 
         .zoom-square.corner {
@@ -1405,19 +1557,6 @@
             justify-content: center;
             gap: 10px;
             margin-top: 10px;
-        }
-
-        .zoom-position-label {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 1.4rem;
-            color: #87CEEB;
-            font-weight: 700;
-            background: rgba(0,0,0,0.2);
-            padding: 12px 25px;
-            border-radius: 15px;
-            display: inline-block;
-            width: 100%;
         }
 
         /* History & Stats Panel */
@@ -1656,11 +1795,6 @@
                 font-size: 1.1rem;
             }
 
-            .zoom-position-label {
-                font-size: 1.1rem;
-                padding: 10px 15px;
-            }
-
             .avatar-gallery {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 8px;
@@ -1699,17 +1833,6 @@
                 font-size: 3.2rem;
             }
         }
-
-        /* Game controls */
-        .game-controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px; }
-        .game-controls button { padding: 8px 14px; font-size: 0.8rem; font-family: 'Fredoka One', cursive; border: none; border-radius: 15px; cursor: pointer; transition: transform 0.2s; }
-        .game-controls button:hover { transform: scale(1.05); }
-        .btn-save { background: linear-gradient(135deg, #4CAF50, #45a049); color: white; }
-        .btn-load { background: linear-gradient(135deg, #2196F3, #1976D2); color: white; }
-        .btn-rules { background: linear-gradient(135deg, #FF9800, #F57C00); color: white; }
-        .btn-music { background: linear-gradient(135deg, #9C27B0, #7B1FA2); color: white; }
-        .btn-music.playing { background: linear-gradient(135deg, #E91E63, #C2185B); box-shadow: 0 0 15px rgba(233, 30, 99, 0.5); }
-        .btn-load:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .music-controls {
             display: none;
@@ -1764,7 +1887,7 @@
             75% { transform: scale(1.8) translateY(-12px) rotate(-5deg); filter: drop-shadow(3px 8px 5px rgba(0,0,0,0.35)) drop-shadow(0 0 8px gold); }
             100% { transform: scale(1) translateY(0) rotate(0deg); filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3)); }
         }
-        .token-on-board { transition: all 0.2s ease; font-size: 2.2rem; position: relative; }
+        .token-on-board { transition: all 0.2s ease; font-size: 2.2rem; position: relative; display: flex; align-items: center; justify-content: center; }
         .token-on-board::after {
             content: '';
             position: absolute;
@@ -1822,15 +1945,7 @@
         .config-item .toggle.active::after { left: 27px; }
         .config-item .toggle-label { color: white; }
         .config-item select option { background: #1a1a2e; color: white; }
-        .game-timer { display: none; background: linear-gradient(135deg, rgba(255,0,0,0.2), rgba(255,100,0,0.2)); padding: 10px 20px; border-radius: 10px; text-align: center; margin-bottom: 10px; border: 2px solid rgba(255,100,0,0.5); }
-        .game-timer.visible { display: block; }
-        .game-timer .timer-label { font-size: 0.8rem; color: #ffcc80; }
-        .game-timer .timer-value { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: #FFD700; }
-        .game-timer.warning { animation: timerPulse 1s infinite; }
         @keyframes timerPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .turn-counter { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 8px; text-align: center; margin-bottom: 10px; }
-        .turn-counter .turn-label { font-size: 0.75rem; color: #87CEEB; }
-        .turn-counter .turn-value { font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: #FFD700; }
         .config-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,215,0,0.2); padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; color: #FFD700; margin: 5px; }
         .config-badges { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
     </style>
@@ -1928,18 +2043,24 @@
     <!-- Game Screen -->
     <div id="game-screen">
         <div class="game-header">
-            <h1>🏰 Disney Monopoly 🏰</h1>
-        </div>
+            <h1>🏰 Disney Monopoly</h1>
 
-        <!-- Game Timer and Turn Counter -->
-        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; padding: 0 20px;">
-            <div class="game-timer" id="game-timer">
-                <div class="timer-label">Temps restant</div>
-                <div class="timer-value" id="timer-value">--:--</div>
+            <div class="header-center">
+                <div class="header-timer" id="header-timer">
+                    <span class="timer-icon">⏱️</span>
+                    <span class="timer-value" id="timer-value">--:--</span>
+                </div>
+                <div class="header-turn" id="header-turn">
+                    <span class="turn-icon">🔄</span>
+                    <span class="turn-value" id="turn-value">0/--</span>
+                </div>
             </div>
-            <div class="turn-counter" id="turn-counter" style="display: none;">
-                <div class="turn-label">Torn</div>
-                <div class="turn-value" id="turn-value">0 / --</div>
+
+            <div class="header-controls">
+                <button class="header-btn btn-save" id="btn-save" onclick="saveGame()" title="Guardar">💾</button>
+                <button class="header-btn btn-load" id="btn-load" onclick="loadGame()" title="Carregar">📂</button>
+                <button class="header-btn btn-rules" onclick="showRules()" title="Regles">📖</button>
+                <button class="header-btn btn-music" id="btn-music" onclick="toggleMusic()" title="Música">🎵</button>
             </div>
         </div>
 
@@ -1956,14 +2077,6 @@
             </div>
 
             <div class="players-panel" id="players-panel">
-                <!-- Game Controls -->
-                <div class="game-controls">
-                    <button class="btn-save" id="btn-save" onclick="saveGame()">💾 Guardar</button>
-                    <button class="btn-load" id="btn-load" onclick="loadGame()">📂 Carregar</button>
-                    <button class="btn-rules" onclick="showRules()">📖 Regles</button>
-                    <button class="btn-music" id="btn-music" onclick="toggleMusic()">🎵 Música</button>
-                </div>
-
                 <!-- Music Controls -->
                 <div class="music-controls" id="music-controls">
                     <button class="btn-track" onclick="playPrevTrack()">⏮</button>
@@ -1978,9 +2091,6 @@
                     <h3>🔍 Vista Actual</h3>
                     <div class="zoom-squares" id="zoom-squares">
                         <!-- Zoom squares will be generated here -->
-                    </div>
-                    <div class="zoom-position-label" id="zoom-position-label">
-                        Casella 0 de 40
                     </div>
                 </div>
 
@@ -2140,26 +2250,68 @@
             initAudio();
             if (!audioCtx) return;
 
-            // Create a series of short clicks to simulate dice rolling
             const now = audioCtx.currentTime;
-            for (let i = 0; i < 8; i++) {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
 
-                osc.connect(gain);
+            // Create realistic dice shaking/tumbling sounds
+            // Multiple rapid hits with decreasing intervals (dice bouncing)
+            const hitCount = 12;
+            for (let i = 0; i < hitCount; i++) {
+                // Each hit gets progressively quieter and closer together
+                const delay = i * 0.06 + Math.random() * 0.02;
+                const volume = 0.15 * (1 - i / hitCount * 0.5);
+
+                // Create noise-like sound for dice hitting surface
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const filter = audioCtx.createBiquadFilter();
+
+                osc1.connect(filter);
+                osc2.connect(filter);
+                filter.connect(gain);
                 gain.connect(audioCtx.destination);
 
-                osc.frequency.value = 200 + Math.random() * 400;
-                osc.type = 'square';
+                // Mix of frequencies for wooden/plastic dice sound
+                osc1.frequency.value = 800 + Math.random() * 600;
+                osc2.frequency.value = 1200 + Math.random() * 800;
+                osc1.type = 'square';
+                osc2.type = 'triangle';
 
-                gain.gain.setValueAtTime(0.1, now + i * 0.08);
-                gain.gain.exponentialDecayTo && gain.gain.exponentialDecayTo(0.01, now + i * 0.08 + 0.05);
-                gain.gain.setValueAtTime(0.1, now + i * 0.08);
-                gain.gain.linearRampToValueAtTime(0.01, now + i * 0.08 + 0.04);
+                // High-pass filter for clicky sound
+                filter.type = 'highpass';
+                filter.frequency.value = 500;
+                filter.Q.value = 1;
 
-                osc.start(now + i * 0.08);
-                osc.stop(now + i * 0.08 + 0.04);
+                gain.gain.setValueAtTime(volume, now + delay);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.03);
+
+                osc1.start(now + delay);
+                osc1.stop(now + delay + 0.03);
+                osc2.start(now + delay);
+                osc2.stop(now + delay + 0.03);
             }
+
+            // Add a subtle shake/rattle undertone
+            const noiseOsc = audioCtx.createOscillator();
+            const noiseGain = audioCtx.createGain();
+            const noiseFilter = audioCtx.createBiquadFilter();
+
+            noiseOsc.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(audioCtx.destination);
+
+            noiseOsc.type = 'sawtooth';
+            noiseOsc.frequency.value = 100;
+            noiseFilter.type = 'bandpass';
+            noiseFilter.frequency.value = 2000;
+            noiseFilter.Q.value = 0.5;
+
+            noiseGain.gain.setValueAtTime(0.08, now);
+            noiseGain.gain.linearRampToValueAtTime(0.02, now + 0.5);
+            noiseGain.gain.linearRampToValueAtTime(0, now + 0.7);
+
+            noiseOsc.start(now);
+            noiseOsc.stop(now + 0.7);
         }
 
         function playDiceLand() {
@@ -2168,38 +2320,58 @@
 
             const now = audioCtx.currentTime;
 
-            // Two "thunk" sounds for dice landing
+            // Two solid "thunk" sounds for dice landing on table
             for (let i = 0; i < 2; i++) {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
+                const delay = i * 0.08;
 
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
+                // Low thump
+                const thump = audioCtx.createOscillator();
+                const thumpGain = audioCtx.createGain();
+                thump.connect(thumpGain);
+                thumpGain.connect(audioCtx.destination);
+                thump.frequency.setValueAtTime(180 - i * 20, now + delay);
+                thump.frequency.exponentialRampToValueAtTime(60, now + delay + 0.1);
+                thump.type = 'sine';
+                thumpGain.gain.setValueAtTime(0.25, now + delay);
+                thumpGain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.12);
+                thump.start(now + delay);
+                thump.stop(now + delay + 0.12);
 
-                osc.frequency.value = 150 + i * 30;
-                osc.type = 'sine';
-
-                gain.gain.setValueAtTime(0.3, now + i * 0.1);
-                gain.gain.linearRampToValueAtTime(0, now + i * 0.1 + 0.15);
-
-                osc.start(now + i * 0.1);
-                osc.stop(now + i * 0.1 + 0.15);
+                // High click overlay
+                const click = audioCtx.createOscillator();
+                const clickGain = audioCtx.createGain();
+                const clickFilter = audioCtx.createBiquadFilter();
+                click.connect(clickFilter);
+                clickFilter.connect(clickGain);
+                clickGain.connect(audioCtx.destination);
+                click.frequency.value = 1500 + Math.random() * 500;
+                click.type = 'square';
+                clickFilter.type = 'highpass';
+                clickFilter.frequency.value = 1000;
+                clickGain.gain.setValueAtTime(0.1, now + delay);
+                clickGain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.02);
+                click.start(now + delay);
+                click.stop(now + delay + 0.02);
             }
 
-            // Success chime
+            // Pleasant success chime
             setTimeout(() => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.frequency.value = 523.25; // C5
-                osc.type = 'sine';
-                const t = audioCtx.currentTime;
-                gain.gain.setValueAtTime(0.2, t);
-                gain.gain.linearRampToValueAtTime(0, t + 0.3);
-                osc.start(t);
-                osc.stop(t + 0.3);
-            }, 250);
+                if (!audioCtx) return;
+                const notes = [659.25, 783.99]; // E5, G5
+                notes.forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.value = freq;
+                    osc.type = 'sine';
+                    const t = audioCtx.currentTime + i * 0.08;
+                    gain.gain.setValueAtTime(0.15, t);
+                    gain.gain.linearRampToValueAtTime(0, t + 0.25);
+                    osc.start(t);
+                    osc.stop(t + 0.25);
+                });
+            }, 200);
         }
 
         function playCollectMoney() {
@@ -2228,20 +2400,34 @@
             if (!audioCtx) return;
 
             const now = audioCtx.currentTime;
-            const notes = [392, 349.23, 311.13]; // G4, F4, Eb4 (descending)
-
-            notes.forEach((freq, i) => {
+            // Create coin drop sounds - multiple metallic "clinks"
+            for (let i = 0; i < 4; i++) {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                osc.connect(gain);
+                const filter = audioCtx.createBiquadFilter();
+
+                osc.connect(filter);
+                filter.connect(gain);
                 gain.connect(audioCtx.destination);
-                osc.frequency.value = freq;
-                osc.type = 'triangle';
-                gain.gain.setValueAtTime(0.15, now + i * 0.12);
-                gain.gain.linearRampToValueAtTime(0, now + i * 0.12 + 0.15);
-                osc.start(now + i * 0.12);
-                osc.stop(now + i * 0.12 + 0.15);
-            });
+
+                // High metallic frequencies for coin sound
+                const baseFreq = 2000 + Math.random() * 1500;
+                osc.frequency.setValueAtTime(baseFreq, now + i * 0.08);
+                osc.frequency.exponentialRampToValueAtTime(800, now + i * 0.08 + 0.1);
+                osc.type = 'square';
+
+                // Bandpass filter for metallic sound
+                filter.type = 'bandpass';
+                filter.frequency.value = 3000;
+                filter.Q.value = 2;
+
+                // Quick attack and decay like a coin hitting surface
+                gain.gain.setValueAtTime(0.12, now + i * 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.12);
+
+                osc.start(now + i * 0.08);
+                osc.stop(now + i * 0.08 + 0.15);
+            }
         }
 
         function playCard() {
@@ -2249,18 +2435,75 @@
             if (!audioCtx) return;
 
             const now = audioCtx.currentTime;
-            // Magical whoosh sound
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.frequency.setValueAtTime(300, now);
-            osc.frequency.exponentialRampToValueAtTime(800, now + 0.2);
-            osc.type = 'sine';
-            gain.gain.setValueAtTime(0.2, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.3);
-            osc.start(now);
-            osc.stop(now + 0.3);
+
+            // Card flip/swoosh sound
+            for (let i = 0; i < 3; i++) {
+                const swoosh = audioCtx.createOscillator();
+                const swooshGain = audioCtx.createGain();
+                const swooshFilter = audioCtx.createBiquadFilter();
+
+                swoosh.connect(swooshFilter);
+                swooshFilter.connect(swooshGain);
+                swooshGain.connect(audioCtx.destination);
+
+                swoosh.type = 'sawtooth';
+                swoosh.frequency.setValueAtTime(100 + i * 50, now + i * 0.02);
+                swoosh.frequency.exponentialRampToValueAtTime(2000, now + i * 0.02 + 0.08);
+
+                swooshFilter.type = 'bandpass';
+                swooshFilter.frequency.value = 1500;
+                swooshFilter.Q.value = 1;
+
+                swooshGain.gain.setValueAtTime(0.08, now + i * 0.02);
+                swooshGain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.02 + 0.1);
+
+                swoosh.start(now + i * 0.02);
+                swoosh.stop(now + i * 0.02 + 0.1);
+            }
+
+            // Paper flick sound
+            const flick = audioCtx.createOscillator();
+            const flickGain = audioCtx.createGain();
+            const flickFilter = audioCtx.createBiquadFilter();
+
+            flick.connect(flickFilter);
+            flickFilter.connect(flickGain);
+            flickGain.connect(audioCtx.destination);
+
+            flick.type = 'square';
+            flick.frequency.value = 3000;
+            flickFilter.type = 'highpass';
+            flickFilter.frequency.value = 2000;
+
+            flickGain.gain.setValueAtTime(0.06, now + 0.05);
+            flickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+            flick.start(now + 0.05);
+            flick.stop(now + 0.1);
+
+            // Magical sparkle chime
+            setTimeout(() => {
+                if (!audioCtx) return;
+                const t = audioCtx.currentTime;
+                const sparkleNotes = [1318.51, 1567.98, 2093.00]; // E6, G6, C7
+
+                sparkleNotes.forEach((freq, i) => {
+                    const sparkle = audioCtx.createOscillator();
+                    const sparkleGain = audioCtx.createGain();
+
+                    sparkle.connect(sparkleGain);
+                    sparkleGain.connect(audioCtx.destination);
+
+                    sparkle.frequency.value = freq;
+                    sparkle.type = 'sine';
+
+                    sparkleGain.gain.setValueAtTime(0.1, t + i * 0.06);
+                    sparkleGain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.06 + 0.2);
+
+                    sparkle.start(t + i * 0.06);
+                    sparkle.stop(t + i * 0.06 + 0.2);
+                });
+            }, 100);
         }
 
         function playJail() {
@@ -2268,20 +2511,96 @@
             if (!audioCtx) return;
 
             const now = audioCtx.currentTime;
-            // Sad trombone-ish sound
-            const notes = [293.66, 277.18, 261.63, 246.94]; // D4, C#4, C4, B3
-            notes.forEach((freq, i) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.frequency.value = freq;
-                osc.type = 'sawtooth';
-                gain.gain.setValueAtTime(0.1, now + i * 0.25);
-                gain.gain.linearRampToValueAtTime(0, now + i * 0.25 + 0.3);
-                osc.start(now + i * 0.25);
-                osc.stop(now + i * 0.25 + 0.3);
-            });
+
+            // Metal cell door slam sound
+            for (let i = 0; i < 3; i++) {
+                const clang = audioCtx.createOscillator();
+                const clangGain = audioCtx.createGain();
+                const clangFilter = audioCtx.createBiquadFilter();
+
+                clang.connect(clangFilter);
+                clangFilter.connect(clangGain);
+                clangGain.connect(audioCtx.destination);
+
+                // Metallic frequencies
+                clang.frequency.value = 200 + i * 150;
+                clang.type = 'square';
+                clangFilter.type = 'bandpass';
+                clangFilter.frequency.value = 800;
+                clangFilter.Q.value = 5;
+
+                clangGain.gain.setValueAtTime(0.2, now);
+                clangGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+                clang.start(now);
+                clang.stop(now + 0.3);
+            }
+
+            // Low rumble for heavy door
+            const rumble = audioCtx.createOscillator();
+            const rumbleGain = audioCtx.createGain();
+            rumble.connect(rumbleGain);
+            rumbleGain.connect(audioCtx.destination);
+            rumble.frequency.value = 60;
+            rumble.type = 'sine';
+            rumbleGain.gain.setValueAtTime(0.3, now);
+            rumbleGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+            rumble.start(now);
+            rumble.stop(now + 0.4);
+
+            // Sad trombone after the slam
+            setTimeout(() => {
+                if (!audioCtx) return;
+                const t = audioCtx.currentTime;
+                const notes = [293.66, 277.18, 261.63, 220]; // D4, C#4, C4, A3
+                notes.forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    const filter = audioCtx.createBiquadFilter();
+
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    osc.frequency.value = freq;
+                    osc.type = 'sawtooth';
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 1000;
+
+                    gain.gain.setValueAtTime(0.12, t + i * 0.22);
+                    gain.gain.linearRampToValueAtTime(0, t + i * 0.22 + 0.28);
+
+                    osc.start(t + i * 0.22);
+                    osc.stop(t + i * 0.22 + 0.28);
+                });
+            }, 350);
+
+            // Chain rattle effect
+            setTimeout(() => {
+                if (!audioCtx) return;
+                const t = audioCtx.currentTime;
+                for (let i = 0; i < 6; i++) {
+                    const rattle = audioCtx.createOscillator();
+                    const rattleGain = audioCtx.createGain();
+                    const rattleFilter = audioCtx.createBiquadFilter();
+
+                    rattle.connect(rattleFilter);
+                    rattleFilter.connect(rattleGain);
+                    rattleGain.connect(audioCtx.destination);
+
+                    rattle.frequency.value = 3000 + Math.random() * 2000;
+                    rattle.type = 'square';
+                    rattleFilter.type = 'highpass';
+                    rattleFilter.frequency.value = 2000;
+
+                    const delay = i * 0.05;
+                    rattleGain.gain.setValueAtTime(0.05, t + delay);
+                    rattleGain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.04);
+
+                    rattle.start(t + delay);
+                    rattle.stop(t + delay + 0.04);
+                }
+            }, 200);
         }
 
         // ==========================================
@@ -2395,7 +2714,8 @@
             { id: 13, text: '¡Olaf necesita ayuda! Paga 50€ al banco', action: 'pay', amount: 50 },
             { id: 14, text: '¡Maui te bendice! Cobra 100€', action: 'collect', amount: 100 },
             { id: 15, text: '¡Retrocede hasta Blancanieves!', action: 'goto', destination: 1 },
-            { id: 16, text: '¡El espejo magico te muestra el camino! Avanza hasta la proxima estacion', action: 'nextStation' }
+            { id: 16, text: '¡El espejo magico te muestra el camino! Avanza hasta la proxima estacion', action: 'nextStation' },
+            { id: 17, text: '🎫 ¡La Hada Madrina te protege! Targeta per Sortir de la Presó Gratis. Guarda-la fins que la necessitis.', action: 'getOutOfJailFree', cardType: 'chance' }
         ];
 
         const CHEST_CARDS = [
@@ -2414,7 +2734,8 @@
             { id: 13, text: '¡Encontraste la lampara! Cobra 100€', action: 'collect', amount: 100 },
             { id: 14, text: '¡Reparaciones del castillo! Paga 40€ por casa y 115€ por hotel', action: 'repairs', houseCost: 40, hotelCost: 115 },
             { id: 15, text: '¡Premio del Festival de las Luces! Cobra 125€', action: 'collect', amount: 125 },
-            { id: 16, text: '¡Te toca ir a la carcel! No pasas por la salida', action: 'jail' }
+            { id: 16, text: '¡Te toca ir a la carcel! No pasas por la salida', action: 'jail' },
+            { id: 17, text: '🎫 ¡El Genio te concede un deseo! Targeta per Sortir de la Presó Gratis. Guarda-la fins que la necessitis.', action: 'getOutOfJailFree', cardType: 'chest' }
         ];
 
         // ==========================================
@@ -2799,7 +3120,8 @@
                     money: gameConfig.startingMoney,
                     position: 0,
                     properties: [],
-                    inJail: false
+                    inJail: false,
+                    getOutOfJailCards: 0 // Number of "Get Out of Jail Free" cards held
                 });
             });
 
@@ -2874,14 +3196,14 @@
         function setupGameTimerAndCounter() {
             // Turn counter
             if (gameConfig.maxTurns > 0) {
-                const turnCounter = document.getElementById('turn-counter');
-                turnCounter.style.display = 'block';
+                const turnCounter = document.getElementById('header-turn');
+                turnCounter.classList.add('visible');
                 updateTurnCounter();
             }
 
             // Game timer
             if (gameConfig.timeLimit > 0) {
-                const gameTimer = document.getElementById('game-timer');
+                const gameTimer = document.getElementById('header-timer');
                 gameTimer.classList.add('visible');
                 gameStartTime = Date.now();
 
@@ -2907,7 +3229,7 @@
             const remaining = (gameConfig.timeLimit * 60 * 1000) - elapsed;
 
             const timerValue = document.getElementById('timer-value');
-            const gameTimer = document.getElementById('game-timer');
+            const gameTimer = document.getElementById('header-timer');
 
             if (remaining <= 0) {
                 timerValue.textContent = '00:00';
@@ -3026,6 +3348,7 @@
                                 <button id="roll-dice">🎲 Tirar Dados</button>
                                 <div class="center-buttons">
                                     <button id="build-btn">🏠 Construir</button>
+                                    <button id="mortgage-btn">🏦 Hipoteca</button>
                                 </div>
                             `;
                             board.appendChild(center);
@@ -3034,6 +3357,7 @@
                             setTimeout(() => {
                                 document.getElementById('roll-dice').addEventListener('click', rollDice);
                                 document.getElementById('build-btn').addEventListener('click', showBuildModal);
+                                document.getElementById('mortgage-btn').addEventListener('click', showMortgageModal);
                             }, 0);
                         }
                     }
@@ -3100,9 +3424,10 @@
 
             let content = '';
 
-            // Color bar for properties
+            // Color border for properties (instead of color bar)
             if (square.type === 'property' && square.group) {
-                content += `<div class="color-bar" style="background: ${PROPERTY_GROUPS[square.group].color}"></div>`;
+                const groupColor = PROPERTY_GROUPS[square.group].color;
+                div.style.border = `4px solid ${groupColor}`;
             }
 
             // Check if custom image exists (images/properties/[squareId].png)
@@ -3244,9 +3569,6 @@
                 container.appendChild(div);
             });
 
-            // Update position label
-            document.getElementById('zoom-position-label').textContent =
-                `Casella ${currentPos + 1} de 40 - ${SQUARES[currentPos].name}`;
         }
 
         // ==========================================
@@ -3641,6 +3963,11 @@
         }
 
         function calculateRent(square, propertyState) {
+            // No rent on mortgaged properties
+            if (propertyState.mortgaged) {
+                return 0;
+            }
+
             if (square.type === 'station') {
                 // Count stations owned by this player
                 const stationsOwned = Object.entries(gameState.properties)
@@ -3690,6 +4017,7 @@
                     class: 'btn-pay',
                     action: () => {
                         player.money -= square.amount;
+                        playPayMoney(); // Coin sound
                         updatePlayersPanel();
                         closeModal();
                         showMessage(`${player.name} pago ${square.amount}€ de impuestos.`);
@@ -3788,6 +4116,7 @@
 
                 case 'pay':
                     player.money -= card.amount;
+                    playPayMoney(); // Coin sound
                     showMessage(`${player.name} paga ${card.amount}€`);
                     updatePlayersPanel();
                     checkBankruptcy(player);
@@ -3843,6 +4172,13 @@
                     handleGoToJail(player);
                     break;
 
+                case 'getOutOfJailFree':
+                    player.getOutOfJailCards++;
+                    showMessage(`🎫 ${player.name} guarda una Targeta per Sortir de la Presó Gratis!`);
+                    addHistory('card', '🎫', `${player.name} ha obtingut una targeta per sortir de la presó gratis!`);
+                    endTurn();
+                    break;
+
                 case 'collectFromAll':
                     let totalCollected = 0;
                     gameState.players.forEach((p, i) => {
@@ -3851,6 +4187,7 @@
                             totalCollected += card.amount;
                         }
                     });
+                    if (totalCollected > 0) playPayMoney(); // Coin sound
                     player.money += totalCollected;
                     showMessage(`${player.name} cobra ${totalCollected}€ de los otros jugadores`);
                     updatePlayersPanel();
@@ -3872,6 +4209,7 @@
                         }
                     });
                     player.money -= totalCost;
+                    if (totalCost > 0) playPayMoney(); // Coin sound
                     showMessage(`${player.name} paga ${totalCost}€ en reparaciones`);
                     updatePlayersPanel();
                     checkBankruptcy(player);
@@ -3931,7 +4269,29 @@
             }
 
             const canAfford = player.money >= square.price;
-            const imageHtml = square.image ? `<div class="property-large-image"><img src="${square.image}" alt="${square.name}"></div>` : '';
+            const hasImage = square.image;
+
+            let bodyContent = '';
+            if (hasImage) {
+                bodyContent = `
+                    <div class="property-landscape">
+                        <div class="property-image-side">
+                            <img src="${square.image}" alt="${square.name}">
+                        </div>
+                        <div class="property-info-side">
+                            <div class="property-price">${square.price}€</div>
+                            ${rentHtml}
+                            ${!canAfford ? '<p style="color: #f44336; margin-top: 10px;">No tienes suficiente dinero.</p>' : ''}
+                        </div>
+                    </div>
+                `;
+            } else {
+                bodyContent = `
+                    <div class="property-price">${square.price}€</div>
+                    ${rentHtml}
+                    ${!canAfford ? '<p style="color: #f44336;">No tienes suficiente dinero.</p>' : ''}
+                `;
+            }
 
             showModal({
                 headerHtml: `
@@ -3941,12 +4301,8 @@
                         ${groupInfo ? `<div class="property-movie">${groupInfo.name}</div>` : ''}
                     </div>
                 `,
-                bodyHtml: `
-                    ${imageHtml}
-                    <div class="property-price">${square.price}€</div>
-                    ${rentHtml}
-                    ${!canAfford ? '<p style="color: #f44336;">No tienes suficiente dinero.</p>' : ''}
-                `,
+                bodyHtml: bodyContent,
+                landscape: hasImage,
                 buttons: canAfford ? [
                     {
                         text: `Comprar por ${square.price}€`,
@@ -3954,24 +4310,140 @@
                         action: () => buyProperty(player, square)
                     },
                     {
-                        text: 'Pasar',
+                        text: '🔨 Subhasta',
                         class: 'btn-pass',
                         action: () => {
                             closeModal();
-                            endTurn();
+                            startAuction(square);
                         }
                     }
                 ] : [
                     {
-                        text: 'Continuar',
+                        text: '🔨 Subhasta',
                         class: 'btn-close',
                         action: () => {
                             closeModal();
-                            endTurn();
+                            startAuction(square);
                         }
                     }
                 ]
             });
+        }
+
+        // ==========================================
+        // AUCTION SYSTEM
+        // ==========================================
+
+        function startAuction(square) {
+            const auctionState = {
+                square: square,
+                currentBid: 0,
+                highestBidder: null,
+                currentBidderIndex: 0,
+                passedPlayers: new Set()
+            };
+            showAuctionModal(auctionState);
+        }
+
+        function showAuctionModal(auctionState) {
+            const { square, currentBid, highestBidder, passedPlayers } = auctionState;
+            let { currentBidderIndex } = auctionState;
+            const groupInfo = square.group ? PROPERTY_GROUPS[square.group] : null;
+            const color = groupInfo?.color || '#2196F3';
+
+            // Find next active bidder
+            let attempts = 0;
+            while ((passedPlayers.has(currentBidderIndex) || gameState.players[currentBidderIndex].bankrupt) && attempts < gameState.players.length) {
+                currentBidderIndex = (currentBidderIndex + 1) % gameState.players.length;
+                attempts++;
+            }
+            auctionState.currentBidderIndex = currentBidderIndex;
+
+            // Check if auction is over
+            const activeBidders = gameState.players.filter((p, i) => !p.bankrupt && !passedPlayers.has(i));
+            if (activeBidders.length <= 1 || attempts >= gameState.players.length) {
+                closeModal();
+                if (highestBidder !== null && currentBid > 0) {
+                    const winner = gameState.players[highestBidder];
+                    winner.money -= currentBid;
+                    winner.properties.push(square.id);
+                    gameState.properties[square.id] = { owner: highestBidder, houses: 0 };
+                    updatePlayersPanel();
+                    updateSquareDisplay(square.id);
+                    addHistory('auction', '🔨', `${winner.name} guanya la subhasta de ${square.name} per ${currentBid}€!`);
+                    showMessage(`🔨 ${winner.name} guanya ${square.name} per ${currentBid}€!`);
+                } else {
+                    showMessage(`La subhasta de ${square.name} ha quedat deserta.`);
+                }
+                endTurn();
+                return;
+            }
+
+            const currentBidder = gameState.players[currentBidderIndex];
+            const minBid = currentBid + 10;
+            const canBid = currentBidder.money >= minBid;
+
+            let biddersHtml = '<div style="margin: 10px 0; text-align: center;">';
+            gameState.players.forEach((p, i) => {
+                if (!p.bankrupt) {
+                    const status = passedPlayers.has(i) ? '❌' : (i === highestBidder ? '👑' : '');
+                    const isCurrent = i === currentBidderIndex;
+                    biddersHtml += `<span style="display: inline-block; padding: 3px 8px; margin: 2px; background: ${isCurrent ? '#FFD700' : '#eee'}; border-radius: 10px; ${passedPlayers.has(i) ? 'opacity: 0.5;' : ''}">${status}${p.name}</span>`;
+                }
+            });
+            biddersHtml += '</div>';
+
+            showModal({
+                headerHtml: `<div class="property-header" style="background: ${color}"><div style="font-size: 2rem">🔨</div><div class="property-name">Subhasta: ${square.name}</div></div>`,
+                bodyHtml: `
+                    <div style="text-align: center; margin: 10px 0;">
+                        <div style="font-size: 1.5rem; color: #E91E63;">Puja: <strong>${currentBid > 0 ? currentBid + '€' : '0€'}</strong></div>
+                        ${highestBidder !== null ? `<div style="color: #4CAF50;">Líder: ${gameState.players[highestBidder].name}</div>` : ''}
+                    </div>
+                    ${biddersHtml}
+                    <div style="text-align: center; margin: 10px 0; padding: 10px; background: #FFF3E0; border-radius: 5px;">
+                        <strong style="color: #FF9800;">Torn: ${currentBidder.name}</strong> (${currentBidder.money}€)
+                    </div>
+                `,
+                buttons: []
+            });
+
+            setTimeout(() => {
+                const modalContent = document.getElementById('modal-content');
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.style.cssText = 'display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px;';
+
+                if (canBid) {
+                    [10, 50, 100].forEach(inc => {
+                        const bidAmt = currentBid + inc;
+                        if (currentBidder.money >= bidAmt) {
+                            const btn = document.createElement('button');
+                            btn.textContent = `${bidAmt}€`;
+                            btn.style.cssText = 'padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;';
+                            btn.onclick = () => {
+                                closeModal();
+                                auctionState.currentBid = bidAmt;
+                                auctionState.highestBidder = currentBidderIndex;
+                                auctionState.currentBidderIndex = (currentBidderIndex + 1) % gameState.players.length;
+                                showAuctionModal(auctionState);
+                            };
+                            buttonsDiv.appendChild(btn);
+                        }
+                    });
+                }
+
+                const passBtn = document.createElement('button');
+                passBtn.textContent = '❌ Passar';
+                passBtn.style.cssText = 'padding: 8px 15px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;';
+                passBtn.onclick = () => {
+                    closeModal();
+                    auctionState.passedPlayers.add(currentBidderIndex);
+                    auctionState.currentBidderIndex = (currentBidderIndex + 1) % gameState.players.length;
+                    showAuctionModal(auctionState);
+                };
+                buttonsDiv.appendChild(passBtn);
+                modalContent.appendChild(buttonsDiv);
+            }, 0);
         }
 
         function showPayRentModal(player, owner, square, rent) {
@@ -4000,6 +4472,7 @@
                         const ownerIndex = gameState.players.indexOf(owner);
                         player.money -= rent;
                         owner.money += rent;
+                        playPayMoney(); // Coin sound
 
                         // Update stats
                         updateStat('rentPaid', gameState.currentPlayerIndex, rent);
@@ -4009,7 +4482,7 @@
                         closeModal();
                         addHistory('rent', '💸', `${player.name} paga ${rent}€ de lloguer a ${owner.name} (${square.name})`);
                         showMessage(`${player.name} pago ${rent}€ a ${owner.name}`);
-                        checkBankruptcy(player);
+                        checkBankruptcy(player, ownerIndex); // Pass creditor for proper bankruptcy handling
                         endTurn();
                     }
                 }]
@@ -4018,9 +4491,46 @@
 
         function showSquareInfo(square) {
             const groupInfo = square.group ? PROPERTY_GROUPS[square.group] : null;
-            const color = groupInfo?.color || '#2196F3';
             const propertyState = gameState.properties[square.id];
             const owner = propertyState ? gameState.players[propertyState.owner] : null;
+
+            // Special handling for chance and chest cards - use landscape layout
+            if (square.type === 'chance' || square.type === 'chest') {
+                const isChance = square.type === 'chance';
+                const cardColor = isChance ? '#FF9800' : '#9C27B0';
+                const cardIcon = isChance ? '🎲' : '📦';
+                const cardTitle = isChance ? 'Suerte' : 'Cofre del Tesoro';
+                const cardDesc = isChance
+                    ? 'Treu una carta de sort! Pot ser bona o dolenta...'
+                    : 'Obre el cofre del tresor! Descobreix què amaga...';
+
+                showModal({
+                    headerHtml: `
+                        <div class="property-header" style="background: ${cardColor}">
+                            <div style="font-size: 2.5rem">${cardIcon}</div>
+                            <div class="property-name">${cardTitle}</div>
+                        </div>
+                    `,
+                    bodyHtml: `
+                        <div class="card-layout">
+                            <div class="card-image">
+                                <img src="${square.image}" alt="${cardTitle}">
+                            </div>
+                            <div class="card-text">
+                                ${cardDesc}
+                            </div>
+                        </div>
+                    `,
+                    buttons: [{
+                        text: 'Cerrar',
+                        class: 'btn-close',
+                        action: closeModal
+                    }]
+                });
+                return;
+            }
+
+            const color = groupInfo?.color || '#2196F3';
 
             let ownerInfo = '';
             if (owner) {
@@ -4053,7 +4563,7 @@
             showModal({
                 headerHtml: `
                     <div class="property-header" style="background: ${color}">
-                        <div style="font-size: 3rem">${square.icon}</div>
+                        <div style="font-size: 3rem">${square.icon || ''}</div>
                         <div class="property-name">${square.name}</div>
                         ${groupInfo ? `<div class="property-movie">${groupInfo.name}</div>` : ''}
                     </div>
@@ -4088,6 +4598,29 @@
             });
         }
 
+        // Get minimum houses in a color group for balanced building
+        function getMinHousesInGroup(playerIndex, group) {
+            const groupProperties = getPropertiesInGroup(group);
+            let minHouses = 5;
+            groupProperties.forEach(sq => {
+                const propState = gameState.properties[sq.id];
+                if (propState && propState.owner === playerIndex) {
+                    const houses = propState.houses || 0;
+                    if (houses < minHouses) minHouses = houses;
+                }
+            });
+            return minHouses;
+        }
+
+        // Check if any property in a group is mortgaged
+        function groupHasMortgagedProperty(playerIndex, group) {
+            const groupProperties = getPropertiesInGroup(group);
+            return groupProperties.some(sq => {
+                const propState = gameState.properties[sq.id];
+                return propState && propState.owner === playerIndex && propState.mortgaged;
+            });
+        }
+
         function getBuildableProperties(playerIndex) {
             const player = gameState.players[playerIndex];
             const buildable = [];
@@ -4099,8 +4632,15 @@
                 // Check if player owns full group
                 if (!playerOwnsFullGroup(playerIndex, square.group)) return;
 
+                // Can't build if any property in the group is mortgaged
+                if (groupHasMortgagedProperty(playerIndex, square.group)) return;
+
                 const propState = gameState.properties[propId];
                 const houses = propState.houses || 0;
+
+                // Balanced building: can only build if this property has the minimum houses in the group
+                const minInGroup = getMinHousesInGroup(playerIndex, square.group);
+                if (houses > minInGroup) return; // Can't build here until others catch up
 
                 // Can build if less than 5 (4 houses + 1 hotel)
                 if (houses < 5) {
@@ -4155,8 +4695,18 @@
                         ? '<div class="mini-hotel"></div>'
                         : Array(item.houses).fill('<div class="mini-house"></div>').join('');
 
-                    const buttonText = item.houses === 4 ? `Hotel ${item.cost}€` : `Casa ${item.cost}€`;
+                    const isUpgradingToHotel = item.houses === 4;
+                    const noBuildings = isUpgradingToHotel
+                        ? gameState.availableHotels <= 0
+                        : gameState.availableHouses <= 0;
+                    const buttonText = isUpgradingToHotel ? `Hotel ${item.cost}€` : `Casa ${item.cost}€`;
                     const isMaxed = item.houses >= 5;
+                    const isDisabled = !canAfford || isMaxed || noBuildings;
+
+                    let disabledReason = '';
+                    if (isMaxed) disabledReason = 'Max';
+                    else if (noBuildings) disabledReason = isUpgradingToHotel ? 'No hotels!' : 'No cases!';
+                    else disabledReason = buttonText;
 
                     listHtml += `
                         <div class="build-property-item" style="border-left-color: ${groupInfo.color}">
@@ -4167,8 +4717,8 @@
                             </div>
                             <button class="btn-add-house"
                                     data-square-id="${item.square.id}"
-                                    ${!canAfford || isMaxed ? 'disabled' : ''}>
-                                ${isMaxed ? 'Max' : buttonText}
+                                    ${isDisabled ? 'disabled' : ''}>
+                                ${disabledReason}
                             </button>
                         </div>
                     `;
@@ -4177,6 +4727,7 @@
 
             listHtml += '</div>';
             listHtml += `<p style="text-align: center; color: #666; margin-top: 10px;">Tu dinero: <strong style="color: #4CAF50;">${player.money}€</strong></p>`;
+            listHtml += `<p style="text-align: center; color: #888; font-size: 0.9rem;">🏠 Cases: ${gameState.availableHouses} | 🏨 Hotels: ${gameState.availableHotels}</p>`;
 
             showModal({
                 headerHtml: `
@@ -4232,6 +4783,7 @@
             }
 
             player.money -= cost;
+            playPayMoney(); // Coin sound
             propState.houses = currentHouses + 1;
 
             // Update building counts
@@ -4257,9 +4809,140 @@
             setTimeout(() => showBuildModal(), 100);
         }
 
-        function showModal({ title, icon, message, color, headerHtml, bodyHtml, buttons }) {
+        // ==========================================
+        // MORTGAGE SYSTEM
+        // ==========================================
+
+        function showMortgageModal() {
+            const player = gameState.players[gameState.currentPlayerIndex];
+
+            // Get properties that can be mortgaged or unmortgaged
+            const mortgageable = [];
+            const unmortgageable = [];
+
+            player.properties.forEach(propId => {
+                const square = SQUARES[propId];
+                const propState = gameState.properties[propId];
+
+                if (propState.mortgaged) {
+                    const unmortgageCost = Math.floor(square.price * 0.55);
+                    unmortgageable.push({
+                        square,
+                        cost: unmortgageCost,
+                        canAfford: player.money >= unmortgageCost
+                    });
+                } else {
+                    const houses = propState.houses || 0;
+                    if (houses === 0) {
+                        mortgageable.push({
+                            square,
+                            value: Math.floor(square.price * 0.5)
+                        });
+                    }
+                }
+            });
+
+            if (mortgageable.length === 0 && unmortgageable.length === 0) {
+                showModal({
+                    title: 'Hipoteca',
+                    icon: '🏦',
+                    message: 'No tens propietats per hipotecar o deshipotecar.',
+                    color: '#9C27B0',
+                    buttons: [{ text: 'Entès', class: 'btn-close', action: closeModal }]
+                });
+                return;
+            }
+
+            let listHtml = '<div class="mortgage-list" style="max-height: 400px; overflow-y: auto;">';
+
+            if (mortgageable.length > 0) {
+                listHtml += '<h4 style="color: #E91E63; margin: 10px 0;">📤 Hipotecar</h4>';
+                mortgageable.forEach(item => {
+                    const groupInfo = PROPERTY_GROUPS[item.square.group] || { color: '#888' };
+                    listHtml += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; margin: 5px 0; background: #f9f9f9; border-radius: 5px; border-left: 4px solid ${groupInfo.color};">
+                            <span>${item.square.name}</span>
+                            <button class="btn-mortgage" data-action="mortgage" data-square-id="${item.square.id}" style="background: #E91E63; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">+${item.value}€</button>
+                        </div>`;
+                });
+            }
+
+            if (unmortgageable.length > 0) {
+                listHtml += '<h4 style="color: #4CAF50; margin: 15px 0 10px;">📥 Deshipotecar</h4>';
+                unmortgageable.forEach(item => {
+                    const groupInfo = PROPERTY_GROUPS[item.square.group] || { color: '#888' };
+                    listHtml += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; margin: 5px 0; background: #fff3e0; border-radius: 5px; border-left: 4px solid ${groupInfo.color};">
+                            <span>${item.square.name} <small style="color: #FF9800;">(hip.)</small></span>
+                            <button class="btn-mortgage" data-action="unmortgage" data-square-id="${item.square.id}" ${!item.canAfford ? 'disabled' : ''} style="background: ${item.canAfford ? '#4CAF50' : '#ccc'}; color: white; border: none; padding: 5px 10px; border-radius: 5px;">-${item.cost}€</button>
+                        </div>`;
+                });
+            }
+
+            listHtml += '</div>';
+            listHtml += `<p style="text-align: center; color: #666; margin-top: 15px;">Diners: <strong style="color: #4CAF50;">${player.money}€</strong></p>`;
+
+            showModal({
+                headerHtml: `<div class="property-header" style="background: #9C27B0"><div style="font-size: 2rem">🏦</div><div class="property-name">Hipoteca</div></div>`,
+                bodyHtml: listHtml,
+                buttons: [{ text: 'Tancar', class: 'btn-close', action: closeModal }]
+            });
+
+            setTimeout(() => {
+                document.querySelectorAll('.btn-mortgage').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const action = btn.dataset.action;
+                        const squareId = parseInt(btn.dataset.squareId);
+                        closeModal();
+                        if (action === 'mortgage') mortgageProperty(squareId);
+                        else unmortgageProperty(squareId);
+                    });
+                });
+            }, 0);
+        }
+
+        function mortgageProperty(squareId) {
+            const player = gameState.players[gameState.currentPlayerIndex];
+            const square = SQUARES[squareId];
+            const propState = gameState.properties[squareId];
+            const mortgageValue = Math.floor(square.price * 0.5);
+
+            propState.mortgaged = true;
+            player.money += mortgageValue;
+            updatePlayersPanel();
+            updateSquareDisplay(squareId);
+            addHistory('mortgage', '🏦', `${player.name} hipoteca ${square.name} per ${mortgageValue}€`);
+            showMessage(`${player.name} hipoteca ${square.name} i rep ${mortgageValue}€`);
+            setTimeout(() => showMortgageModal(), 100);
+        }
+
+        function unmortgageProperty(squareId) {
+            const player = gameState.players[gameState.currentPlayerIndex];
+            const square = SQUARES[squareId];
+            const propState = gameState.properties[squareId];
+            const unmortgageCost = Math.floor(square.price * 0.55);
+
+            if (player.money < unmortgageCost) {
+                showMessage('No tens prou diners!');
+                return;
+            }
+
+            propState.mortgaged = false;
+            player.money -= unmortgageCost;
+            playPayMoney(); // Coin sound
+            updatePlayersPanel();
+            updateSquareDisplay(squareId);
+            addHistory('mortgage', '🏦', `${player.name} deshipoteca ${square.name} per ${unmortgageCost}€`);
+            showMessage(`${player.name} deshipoteca ${square.name} pagant ${unmortgageCost}€`);
+            setTimeout(() => showMortgageModal(), 100);
+        }
+
+        function showModal({ title, icon, message, color, headerHtml, bodyHtml, buttons, landscape }) {
             const overlay = document.getElementById('modal-overlay');
             const content = document.getElementById('modal-content');
+
+            // Reset classes and add landscape if needed
+            content.className = 'modal' + (landscape ? ' landscape' : '');
 
             let html = '';
 
@@ -4343,11 +5026,104 @@
             endTurn();
         }
 
-        function checkBankruptcy(player) {
-            if (player.money < 0) {
-                player.bankrupt = true;
-                showMessage(`¡${player.name} esta en bancarrota!`);
-                // TODO: Handle bankruptcy properly
+        function checkBankruptcy(player, creditorIndex = null) {
+            if (player.money >= 0) return;
+
+            const playerIndex = gameState.players.indexOf(player);
+
+            // Calculate total assets (properties + houses)
+            let totalAssets = 0;
+            player.properties.forEach(propId => {
+                const square = SQUARES[propId];
+                const propState = gameState.properties[propId];
+                if (!propState.mortgaged) {
+                    totalAssets += Math.floor(square.price * 0.5); // Mortgage value
+                }
+                if (propState.houses > 0) {
+                    totalAssets += propState.houses * Math.floor(square.houseCost * 0.5); // Sell houses at half price
+                }
+            });
+
+            // If player can cover debt by selling/mortgaging, don't declare bankruptcy yet
+            if (player.money + totalAssets >= 0) {
+                showMessage(`⚠️ ${player.name} té deutes! Hauria d'hipotecar propietats.`);
+                return;
+            }
+
+            // Player is truly bankrupt
+            player.bankrupt = true;
+            addHistory('bankruptcy', '💀', `${player.name} ha fet fallida!`);
+
+            // Return houses/hotels to pool
+            player.properties.forEach(propId => {
+                const propState = gameState.properties[propId];
+                if (propState.houses > 0) {
+                    if (propState.houses === 5) {
+                        gameState.availableHotels++;
+                    } else {
+                        gameState.availableHouses += propState.houses;
+                    }
+                }
+            });
+
+            if (creditorIndex !== null && creditorIndex !== undefined) {
+                // Owing to another player - transfer everything
+                const creditor = gameState.players[creditorIndex];
+
+                // Transfer properties
+                player.properties.forEach(propId => {
+                    const propState = gameState.properties[propId];
+                    propState.owner = creditorIndex;
+                    propState.houses = 0; // Already sold
+                    creditor.properties.push(propId);
+                    updateSquareDisplay(propId);
+                });
+
+                // Transfer Get Out of Jail cards
+                creditor.getOutOfJailCards += player.getOutOfJailCards;
+                player.getOutOfJailCards = 0;
+
+                // Clear bankrupt player's properties
+                player.properties = [];
+                player.money = 0;
+
+                showMessage(`💀 ${player.name} fa fallida! Les propietats passen a ${creditor.name}`);
+            } else {
+                // Owing to bank - auction all properties
+                const propsToAuction = [...player.properties];
+                player.properties = [];
+                player.money = 0;
+                player.getOutOfJailCards = 0;
+
+                // Clear ownership and auction each property
+                propsToAuction.forEach(propId => {
+                    delete gameState.properties[propId];
+                    updateSquareDisplay(propId);
+                });
+
+                showMessage(`💀 ${player.name} fa fallida! Les propietats tornen al banc.`);
+
+                // Could trigger auctions here, but for simplicity properties just return to bank
+            }
+
+            updatePlayersPanel();
+
+            // Check if only one player remains
+            const activePlayers = gameState.players.filter(p => !p.bankrupt);
+            if (activePlayers.length === 1) {
+                setTimeout(() => {
+                    showModal({
+                        title: '🏆 VICTÒRIA!',
+                        icon: '🎉',
+                        message: `${activePlayers[0].name} ha guanyat la partida!`,
+                        color: '#FFD700',
+                        buttons: [{
+                            text: 'Nova Partida',
+                            class: 'btn-buy',
+                            action: () => location.reload()
+                        }]
+                    });
+                }, 1000);
             }
         }
 
@@ -4455,6 +5231,9 @@
                     <div class="money">${player.money}€</div>
                     <div class="properties-count">🏠 ${player.properties.length} propiedades</div>
                 `;
+
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', () => showPlayerProperties(index));
 
                 cardsContainer.appendChild(card);
             });
@@ -4846,6 +5625,31 @@
         function handleJailTurn(player) {
             player.jailTurns = (player.jailTurns || 0) + 1;
 
+            // Build jail options HTML
+            let jailOptionsHtml = `
+                <div class="jail-options">
+                    <div class="jail-option" data-action="pay">
+                        <span class="option-icon">💰</span>
+                        <span class="option-text">Pagar fiança</span>
+                        <span class="option-cost">${gameConfig.jailFine}€</span>
+                    </div>
+                    <div class="jail-option" data-action="roll">
+                        <span class="option-icon">🎲</span>
+                        <span class="option-text">Tirar els daus (dobles per sortir)</span>
+                    </div>`;
+
+            // Add card option if player has one
+            if (player.getOutOfJailCards > 0) {
+                jailOptionsHtml += `
+                    <div class="jail-option" data-action="card" style="background: linear-gradient(135deg, #FFD700, #FFA500);">
+                        <span class="option-icon">🎫</span>
+                        <span class="option-text">Usar Targeta Sortir Gratis</span>
+                        <span class="option-cost">(Tens ${player.getOutOfJailCards})</span>
+                    </div>`;
+            }
+
+            jailOptionsHtml += '</div>';
+
             showModal({
                 headerHtml: `
                     <div class="property-header" style="background: #FF5722">
@@ -4855,17 +5659,7 @@
                 `,
                 bodyHtml: `
                     <p style="margin: 15px 0; color: #666;">Torn ${player.jailTurns} a la preso. Com vols sortir?</p>
-                    <div class="jail-options">
-                        <div class="jail-option" data-action="pay">
-                            <span class="option-icon">💰</span>
-                            <span class="option-text">Pagar fiança</span>
-                            <span class="option-cost">${gameConfig.jailFine}€</span>
-                        </div>
-                        <div class="jail-option" data-action="roll">
-                            <span class="option-icon">🎲</span>
-                            <span class="option-text">Tirar els daus (dobles per sortir)</span>
-                        </div>
-                    </div>
+                    ${jailOptionsHtml}
                 `,
                 buttons: []
             });
@@ -4878,12 +5672,24 @@
                         closeModal();
                         if (action === 'pay') {
                             payJailFine(player);
+                        } else if (action === 'card') {
+                            useGetOutOfJailCard(player);
                         } else {
                             rollForJailEscape(player);
                         }
                     });
                 });
             }, 100);
+        }
+
+        function useGetOutOfJailCard(player) {
+            player.getOutOfJailCards--;
+            player.inJail = false;
+            player.jailTurns = 0;
+            updatePlayersPanel();
+            showMessage(`🎫 ${player.name} utilitza la Targeta Sortir de la Presó Gratis!`);
+            addHistory('card', '🎫', `${player.name} utilitza una targeta per sortir de la presó!`);
+            document.getElementById('roll-dice').disabled = false;
         }
 
         function payJailFine(player) {
@@ -4894,6 +5700,7 @@
                 return;
             }
             player.money -= jailFine;
+            playPayMoney();
             player.inJail = false;
             player.jailTurns = 0;
             updatePlayersPanel();
@@ -4909,6 +5716,9 @@
             rollBtn.disabled = true;
             die1El.classList.add('rolling');
             die2El.classList.add('rolling');
+
+            // Play rolling sound
+            playDiceRoll();
 
             let rolls = 0;
             const rollInterval = setInterval(() => {
@@ -4927,6 +5737,9 @@
                     die1El.classList.remove('rolling');
                     die2El.classList.remove('rolling');
 
+                    // Play dice landing sound
+                    playDiceLand();
+
                     if (dice1 === dice2) {
                         // Doubles! Player escapes
                         player.inJail = false;
@@ -4940,6 +5753,7 @@
                             // Must pay after 3 turns
                             const jailFine = gameConfig.jailFine;
                             player.money -= jailFine;
+                            playPayMoney(); // Coin sound
                             player.inJail = false;
                             player.jailTurns = 0;
                             showMessage(`${player.name} porta 3 torns, paga ${jailFine}€ i surt!`);
