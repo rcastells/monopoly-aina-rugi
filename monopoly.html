@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disney Monopoly</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Setup Screen -->
+    <div id="setup-screen">
+        <h1>🏰 Disney Monopoly 🏰</h1>
+        <p class="subtitle">El joc de les pel·lícules màgiques</p>
+
+        <div class="setup-container">
+            <!-- Mode Selection -->
+            <div class="mode-selection">
+                <h2>Escull el mode de joc</h2>
+                <div class="mode-buttons">
+                    <div class="mode-btn selected" data-mode="classic">
+                        <div class="mode-icon">🎩</div>
+                        <div class="mode-name">Classic</div>
+                        <div class="mode-desc">Regles tradicionals</div>
+                    </div>
+                    <div class="mode-btn" data-mode="quick">
+                        <div class="mode-icon">⚡</div>
+                        <div class="mode-name">Rapid</div>
+                        <div class="mode-desc">Partida mes curta</div>
+                    </div>
+                    <div class="mode-btn" data-mode="custom">
+                        <div class="mode-icon">⚙️</div>
+                        <div class="mode-name">Personalitzat</div>
+                        <div class="mode-desc">Configura les opcions</div>
+                    </div>
+                </div>
+
+                <!-- Custom Config Panel -->
+                <div class="custom-config" id="custom-config">
+                    <h3>Configuracio Personalitzada</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Diners inicials</label>
+                            <input type="range" id="cfg-money" min="500" max="3000" step="100" value="1500">
+                            <div class="range-value" id="cfg-money-value">1500€</div>
+                        </div>
+                        <div class="config-item">
+                            <label>Bonus per passar SORTIDA</label>
+                            <input type="range" id="cfg-go" min="100" max="400" step="50" value="200">
+                            <div class="range-value" id="cfg-go-value">200€</div>
+                        </div>
+                        <div class="config-item">
+                            <label>Limit de torns (0 = sense limit)</label>
+                            <input type="range" id="cfg-turns" min="0" max="150" step="10" value="0">
+                            <div class="range-value" id="cfg-turns-value">Sense limit</div>
+                        </div>
+                        <div class="config-item">
+                            <label>Limit de temps (minuts, 0 = sense limit)</label>
+                            <input type="range" id="cfg-time" min="0" max="90" step="5" value="0">
+                            <div class="range-value" id="cfg-time-value">Sense limit</div>
+                        </div>
+                        <div class="config-item">
+                            <label>Propietats inicials per jugador</label>
+                            <select id="cfg-initial-props">
+                                <option value="0">Cap (regles normals)</option>
+                                <option value="2">2 propietats aleatories</option>
+                                <option value="3">3 propietats aleatories</option>
+                                <option value="4">4 propietats aleatories</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>Subhastes</label>
+                            <div class="toggle-container">
+                                <div class="toggle active" id="cfg-auctions" data-value="true"></div>
+                                <span class="toggle-label">Activades</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="config-badges" id="config-summary"></div>
+            </div>
+
+            <h2>Quants jugadors?</h2>
+            <div class="player-count">
+                <button data-count="2">2</button>
+                <button data-count="3">3</button>
+                <button data-count="4">4</button>
+                <button data-count="5">5</button>
+                <button data-count="6">6</button>
+            </div>
+
+            <div class="player-setup" id="player-setup">
+                <!-- Player inputs will be generated here -->
+            </div>
+
+            <button id="start-game">Començar a Jugar!</button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen">
+        <div class="game-header">
+            <h1>🏰 Disney Monopoly</h1>
+
+            <div class="header-center">
+                <div class="header-timer" id="header-timer">
+                    <span class="timer-icon">⏱️</span>
+                    <span class="timer-value" id="timer-value">--:--</span>
+                </div>
+                <div class="header-turn" id="header-turn">
+                    <span class="turn-icon">🔄</span>
+                    <span class="turn-value" id="turn-value">0/--</span>
+                </div>
+            </div>
+
+            <div class="header-controls">
+                <button class="header-btn btn-save" id="btn-save" title="Desar">💾</button>
+                <button class="header-btn btn-load" id="btn-load" title="Carregar" disabled>📂</button>
+                <button class="header-btn btn-rules" title="Regles">📖</button>
+                <div class="header-music" id="music-controls">
+                    <button class="header-btn btn-music" id="btn-music" title="Música">🎵</button>
+                    <div class="header-music-expanded">
+                        <button class="music-nav-btn" title="Anterior">⏮</button>
+                        <button class="music-nav-btn" title="Següent">⏭</button>
+                        <span class="now-playing" id="now-playing">-</span>
+                        <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="50" title="Volum">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-layout">
+            <!-- Left Panel: Players 1 & 2 -->
+            <div class="players-panel left-panel" id="players-left">
+                <!-- Players 1 & 2 will be generated here -->
+            </div>
+
+            <!-- Center: Board -->
+            <div class="board-section">
+                <div class="board-container">
+                    <div class="board" id="board">
+                        <!-- Board will be generated by JS -->
+                    </div>
+                </div>
+
+                <!-- History & Stats below the board -->
+                <div class="history-stats-panel">
+                    <div class="panel-tabs">
+                        <button class="panel-tab active">📜 Historial</button>
+                        <button class="panel-tab">📊 Estadístiques</button>
+                    </div>
+                    <div class="panel-content" id="history-panel">
+                        <div class="history-list" id="history-list">
+                            <div class="history-empty">La partida encara no ha començat...</div>
+                        </div>
+                    </div>
+                    <div class="panel-content hidden" id="stats-panel">
+                        <div class="stats-content" id="stats-content">
+                            <div class="history-empty">Les estadístiques apareixeran aquí...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Players 3+ -->
+            <div class="players-panel right-panel" id="players-right">
+                <!-- Players 3+ will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Area -->
+    <div class="message-area" id="message-area"></div>
+
+    <!-- Property Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal" id="modal-content">
+            <!-- Modal content will be generated dynamically -->
+        </div>
+    </div>
+
+    <!-- Load modular JavaScript -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
